@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import background from './background.jpg';
 import { searchAlbums } from './utils/utils';
+import Result from './components/Result'; // Import the Result component
 
 function App() {
   const [data, setData] = useState([]);
@@ -9,11 +10,19 @@ function App() {
   const [results, setResults] = useState([]);
 
   useEffect(() => {
-    fetch('/data.json')
-      .then(response => response.json())
+    fetch('/data.json') // Ensure this path is correct
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
       .then(data => {
         setData(data);
         console.log(data); // Log the JSON data once loaded
+      })
+      .catch(error => {
+        console.error('Error fetching the data:', error);
       });
   }, []);
 
@@ -45,29 +54,7 @@ function App() {
           {results.length > 0 && (
             <ul className="results-list">
               {results.map((result, index) => (
-                <li key={index} className={`result-${result.type}`}>
-                  {result.type === 'album' && (
-                    <div>
-                      <strong>Album:</strong> {result.title}<br />
-                      <strong>Songs:</strong> {result.numberOfSongs}<br />
-                      <strong>Description:</strong> {result.description}...
-                    </div>
-                  )}
-                  {result.type === 'song' && (
-                    <div>
-                      <strong>Song:</strong> {result.title}<br />
-                      <strong>Length:</strong> {result.length}<br />
-                      <strong>Album:</strong> {result.albumTitle}
-                    </div>
-                  )}
-                  {result.type === 'description' && (
-                    <div>
-                      <strong>Album:</strong> {result.title}<br />
-                      <strong>Snippet:</strong> {result.snippet}...<br />
-                      <strong>Songs:</strong> {result.numberOfSongs}
-                    </div>
-                  )}
-                </li>
+                <Result key={index} result={result} searchTerm={searchTerm} />
               ))}
             </ul>
           )}

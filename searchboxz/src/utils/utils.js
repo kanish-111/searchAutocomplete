@@ -1,5 +1,3 @@
-// src/utils/utils.js
-
 export const searchAlbums = (data, term) => {
     if (!term) return [];
   
@@ -12,6 +10,7 @@ export const searchAlbums = (data, term) => {
         if (album.title.toLowerCase().includes(lowerTerm)) {
           results.push({
             type: "album",
+            artist: artist.name, // Include artist name
             title: album.title,
             numberOfSongs: album.songs.length,
             description: album.description.substring(0, 50)
@@ -24,6 +23,7 @@ export const searchAlbums = (data, term) => {
           const snippet = album.description.substring(startIndex, startIndex + 50);
           results.push({
             type: "description",
+            artist: artist.name, // Include artist name
             title: album.title,
             snippet: snippet,
             numberOfSongs: album.songs.length
@@ -35,6 +35,7 @@ export const searchAlbums = (data, term) => {
           if (song.title.toLowerCase().includes(lowerTerm)) {
             results.push({
               type: "song",
+              artist: artist.name, // Include artist name
               title: song.title,
               length: song.length,
               albumTitle: album.title
