@@ -39,14 +39,26 @@ function App() {
     } else if (event.key === 'Enter') {
       if (activeIndex >= 0) {
         const selectedResult = results[activeIndex];
-        setSearchTerm(selectedResult.title);
+        if (selectedResult.type === 'artist') {
+          setSearchTerm(selectedResult.artist);
+        } else if (selectedResult.type === 'description' || selectedResult.type === 'album') {
+          setSearchTerm(selectedResult.title);
+        } else {
+          setSearchTerm(selectedResult.title);
+        }
         setResults([]);
       }
     }
   };
 
   const handleResultClick = (result) => {
-    setSearchTerm(result.title);
+    if (result.type === 'artist') {
+      setSearchTerm(result.artist);
+    } else if (result.type === 'description' || result.type === 'album') {
+      setSearchTerm(result.title);
+    } else {
+      setSearchTerm(result.title);
+    }
     setResults([]);
   };
 

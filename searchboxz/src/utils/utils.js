@@ -6,6 +6,19 @@ export const searchAndSuggest = (data, term) => {
   const lowerTerm = term.toLowerCase();
 
   data.forEach(artist => {
+    // Search in artist name
+    if (artist.name.toLowerCase().includes(lowerTerm)) {
+      if (!suggestion && artist.name.toLowerCase().startsWith(lowerTerm)) {
+        suggestion = artist.name;
+      }
+      results.push({
+        type: "artist",
+        artist: artist.name,
+        numberOfAlbums: artist.albums.length,
+        remaining: artist.name.toLowerCase().startsWith(lowerTerm) ? artist.name.slice(lowerTerm.length) : ""
+      });
+    }
+
     artist.albums.forEach(album => {
       // Search in album title
       if (album.title.toLowerCase().includes(lowerTerm)) {

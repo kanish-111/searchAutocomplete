@@ -10,6 +10,12 @@ const highlightTerm = (text, term) => {
 const Result = ({ result, searchTerm }) => {
   return (
     <li className={`result-${result.type}`}>
+      {result.type === 'artist' && (
+        <div className="eachResultDiv">
+          <div><strong>Artist:</strong> {highlightTerm(result.artist, searchTerm)}<br /></div>
+          <div><strong>Albums:</strong> {result.numberOfAlbums}</div>
+        </div>
+      )}
       {result.type === 'album' && (
         <div className="eachResultDiv">
           <div><strong>Artist:</strong> {highlightTerm(result.artist, searchTerm)}<br /></div>
