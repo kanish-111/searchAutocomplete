@@ -84,11 +84,24 @@
   margin: 0;
   width: 720px;
   background: rgba(0, 0, 0, 0.5);
-  border-radius: 10px;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
   backdrop-filter: blur(9px);
   -webkit-backdrop-filter: blur(8px);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   color: #ffffff;
+}
+
+
+/* Style each result item */
+.result-item {
+  padding: 10px;
+  cursor: pointer;
+}
+
+/* Highlight the hovered or active item */
+.result-item:hover, .result-item.active {
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 

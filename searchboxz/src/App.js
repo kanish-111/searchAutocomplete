@@ -1,29 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 import background from './background.jpg';
-import { searchAlbums } from './utils/utils';
+import { searchAndSuggest } from './utils/utils';
 import Result from './components/Result'; // Import the Result component
 
 function App() {
   const [data, setData] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [results, setResults] = useState([]);
+  const [activeIndex, setActiveIndex] = useState(-1);
+  const inputRef = useRef(null);
 
   useEffect(() => {
-    fetch('/data.json') // Ensure this path is correct
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then(data => {
-        setData(data);
-        console.log(data); // Log the JSON data once loaded
-      })
-      .catch(error => {
-        console.error('Error fetching the data:', error);
-      });
+    fetch('/data.json')
+      .then(response => response.json())
+      .then(data => setData(data))
+      .catch(error => console.error('Error fetching the data:', error));
   }, []);
 
   const handleInputChange = (event) => {
@@ -31,12 +23,31 @@ function App() {
     setSearchTerm(term);
 
     if (term.length > 3) {
-      const searchResults = searchAlbums(data, term);
-      setResults(searchResults);
-      console.log(searchResults);
+      const { results } = searchAndSuggest(data, term);
+      setResults(results);
     } else {
       setResults([]);
     }
+    setActiveIndex(-1);
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === 'ArrowDown') {
+      setActiveIndex((prevIndex) => Math.min(prevIndex + 1, results.length - 1));
+    } else if (event.key === 'ArrowUp') {
+      setActiveIndex((prevIndex) => Math.max(prevIndex - 1, 0));
+    } else if (event.key === 'Enter') {
+      if (activeIndex >= 0) {
+        const selectedResult = results[activeIndex];
+        setSearchTerm(selectedResult.title);
+        setResults([]);
+      }
+    }
+  };
+
+  const handleResultClick = (result) => {
+    setSearchTerm(result.title);
+    setResults([]);
   };
 
   return (
@@ -50,11 +61,19 @@ function App() {
             placeholder="Search..."
             value={searchTerm}
             onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
+            ref={inputRef}
           />
           {results.length > 0 && (
             <ul className="results-list">
               {results.map((result, index) => (
-                <Result key={index} result={result} searchTerm={searchTerm} />
+                <li
+                  key={index}
+                  className={`result-item ${index === activeIndex ? 'active' : ''}`}
+                  onMouseDown={() => handleResultClick(result)}
+                >
+                  <Result result={result} searchTerm={searchTerm} />
+                </li>
               ))}
             </ul>
           )}
