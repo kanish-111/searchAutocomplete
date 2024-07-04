@@ -5,7 +5,7 @@ export const searchAndSuggest = (data, term) => {
   let suggestion = "";
   const lowerTerm = term.toLowerCase();
 
-  data.forEach(artist => {
+  data.forEach((artist) => {
     // Search in artist name
     if (artist.name.toLowerCase().includes(lowerTerm)) {
       if (!suggestion && artist.name.toLowerCase().startsWith(lowerTerm)) {
@@ -15,11 +15,13 @@ export const searchAndSuggest = (data, term) => {
         type: "artist",
         artist: artist.name,
         numberOfAlbums: artist.albums.length,
-        remaining: artist.name.toLowerCase().startsWith(lowerTerm) ? artist.name.slice(lowerTerm.length) : ""
+        remaining: artist.name.toLowerCase().startsWith(lowerTerm)
+          ? artist.name.slice(lowerTerm.length)
+          : "",
       });
     }
 
-    artist.albums.forEach(album => {
+    artist.albums.forEach((album) => {
       // Search in album title
       if (album.title.toLowerCase().includes(lowerTerm)) {
         if (!suggestion && album.title.toLowerCase().startsWith(lowerTerm)) {
@@ -31,26 +33,14 @@ export const searchAndSuggest = (data, term) => {
           title: album.title,
           numberOfSongs: album.songs.length,
           description: album.description.substring(0, 50),
-          remaining: album.title.toLowerCase().startsWith(lowerTerm) ? album.title.slice(lowerTerm.length) : ""
-        });
-      }
-
-      // Search in album description
-      if (album.description.toLowerCase().includes(lowerTerm)) {
-        const startIndex = album.description.toLowerCase().indexOf(lowerTerm);
-        const snippet = ( startIndex > 3 ? '...' : '') + album.description.substring(startIndex, startIndex + 50);
-        results.push({
-          type: "description",
-          artist: artist.name,
-          title: album.title,
-          snippet: snippet,
-          numberOfSongs: album.songs.length,
-          remaining: album.description.toLowerCase().startsWith(lowerTerm) ? album.description.slice(lowerTerm.length) : ""
+          remaining: album.title.toLowerCase().startsWith(lowerTerm)
+            ? album.title.slice(lowerTerm.length)
+            : "",
         });
       }
 
       // Search in song titles
-      album.songs.forEach(song => {
+      album.songs.forEach((song) => {
         if (song.title.toLowerCase().includes(lowerTerm)) {
           if (!suggestion && song.title.toLowerCase().startsWith(lowerTerm)) {
             suggestion = song.title;
@@ -61,10 +51,30 @@ export const searchAndSuggest = (data, term) => {
             title: song.title,
             length: song.length,
             albumTitle: album.title,
-            remaining: song.title.toLowerCase().startsWith(lowerTerm) ? song.title.slice(lowerTerm.length) : ""
+            remaining: song.title.toLowerCase().startsWith(lowerTerm)
+              ? song.title.slice(lowerTerm.length)
+              : "",
           });
         }
       });
+
+      // Search in album description
+      if (album.description.toLowerCase().includes(lowerTerm)) {
+        const startIndex = album.description.toLowerCase().indexOf(lowerTerm);
+        const snippet =
+          (startIndex > 3 ? "..." : "") +
+          album.description.substring(startIndex, startIndex + 50);
+        results.push({
+          type: "description",
+          artist: artist.name,
+          title: album.title,
+          snippet: snippet,
+          numberOfSongs: album.songs.length,
+          remaining: album.description.toLowerCase().startsWith(lowerTerm)
+            ? album.description.slice(lowerTerm.length)
+            : "",
+        });
+      }
     });
   });
 
