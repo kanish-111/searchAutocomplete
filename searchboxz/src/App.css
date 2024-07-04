@@ -68,7 +68,7 @@
   padding: 0 10px;
   border: none;
   outline: none;
-  border-radius: 10px;
+  border-radius: 5px;
   background: rgba(0, 0, 0, 0.3);
   font-size: 16px;
   color: rgb(255, 255, 255);
@@ -84,8 +84,8 @@
   margin: 0;
   width: 720px;
   background: rgba(0, 0, 0, 0.5);
-  border-bottom-left-radius: 10px;
-  border-bottom-right-radius: 10px;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
   backdrop-filter: blur(9px);
   -webkit-backdrop-filter: blur(8px);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -104,6 +104,14 @@
   background-color: rgba(255, 255, 255, 0.2);
 }
 
+.search-bar::placeholder {
+  color: rgba(255, 255, 255, 0.658); /* Example color, adjust as needed */
+}
+
+.search-bar-active {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
 
 .results-list li {
   padding: 10px;
@@ -111,11 +119,11 @@
 }
 
 .results-list li:hover {
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 .result-album {
-  font-weight: bold;
+  /* font-weight: bold; */
 }
 
 .result-song {

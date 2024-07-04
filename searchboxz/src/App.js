@@ -9,6 +9,7 @@ function App() {
   const [searchTerm, setSearchTerm] = useState("");
   const [results, setResults] = useState([]);
   const [activeIndex, setActiveIndex] = useState(-1);
+  const [initialTerm, setInitialTerm] = useState(""); // New state for initial term
   const inputRef = useRef(null);
 
   useEffect(() => {
@@ -21,6 +22,7 @@ function App() {
   const handleInputChange = (event) => {
     const term = event.target.value;
     setSearchTerm(term);
+    setInitialTerm(term); // Update initial term whenever input changes
 
     if (term.length > 3) {
       const { results } = searchAndSuggest(data, term);
@@ -33,20 +35,42 @@ function App() {
 
   const handleKeyDown = (event) => {
     if (event.key === 'ArrowDown') {
-      setActiveIndex((prevIndex) => Math.min(prevIndex + 1, results.length - 1));
+      if (activeIndex === -1) {
+        setInitialTerm(searchTerm); // Save the initial term before navigation
+      }
+      setActiveIndex((prevIndex) => {
+        const newIndex = Math.min(prevIndex + 1, results.length - 1);
+        updateSearchTerm(results, newIndex);
+        return newIndex;
+      });
     } else if (event.key === 'ArrowUp') {
-      setActiveIndex((prevIndex) => Math.max(prevIndex - 1, 0));
+      setActiveIndex((prevIndex) => {
+        const newIndex = Math.max(prevIndex - 1, -1);
+        if (newIndex === -1) {
+          setSearchTerm(initialTerm); // Restore the initial term
+        } else {
+          updateSearchTerm(results, newIndex);
+        }
+        return newIndex;
+      });
     } else if (event.key === 'Enter') {
       if (activeIndex >= 0) {
         const selectedResult = results[activeIndex];
-        if (selectedResult.type === 'artist') {
-          setSearchTerm(selectedResult.artist);
-        } else if (selectedResult.type === 'description' || selectedResult.type === 'album') {
-          setSearchTerm(selectedResult.title);
-        } else {
-          setSearchTerm(selectedResult.title);
-        }
+        setSearchTerm(selectedResult.title);
         setResults([]);
+      }
+    }
+  };
+
+  const updateSearchTerm = (results, index) => {
+    if (index >= 0 && index < results.length) {
+      const selectedResult = results[index];
+      if (selectedResult.type === 'artist') {
+        setSearchTerm(selectedResult.artist);
+      } else if (selectedResult.type === 'description' || selectedResult.type === 'album') {
+        setSearchTerm(selectedResult.title);
+      } else {
+        setSearchTerm(selectedResult.title);
       }
     }
   };
@@ -69,7 +93,7 @@ function App() {
         <div className="box">
           <input
             type="text"
-            className="search-bar"
+            className={`search-bar ${results.length > 0 ? 'search-bar-active' : ''}`}
             placeholder="Search..."
             value={searchTerm}
             onChange={handleInputChange}
@@ -83,6 +107,7 @@ function App() {
                   key={index}
                   className={`result-item ${index === activeIndex ? 'active' : ''}`}
                   onMouseDown={() => handleResultClick(result)}
+                  onMouseEnter={() => setActiveIndex(index)} // Update the active index on hover
                 >
                   <Result result={result} searchTerm={searchTerm} />
                 </li>
