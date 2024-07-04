@@ -38,7 +38,7 @@ export const searchAndSuggest = (data, term) => {
       // Search in album description
       if (album.description.toLowerCase().includes(lowerTerm)) {
         const startIndex = album.description.toLowerCase().indexOf(lowerTerm);
-        const snippet = album.description.substring(startIndex, startIndex + 50);
+        const snippet = ( startIndex > 3 ? '...' : '') + album.description.substring(startIndex, startIndex + 50);
         results.push({
           type: "description",
           artist: artist.name,

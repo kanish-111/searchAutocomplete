@@ -10,14 +10,32 @@ function App() {
   const [results, setResults] = useState([]);
   const [activeIndex, setActiveIndex] = useState(-1);
   const [initialTerm, setInitialTerm] = useState(""); // New state for initial term
+  const [showResults, setShowResults] = useState(false);
   const inputRef = useRef(null);
+  const resultsRef = useRef(null);
 
   useEffect(() => {
     fetch('/data.json')
       .then(response => response.json())
       .then(data => setData(data))
       .catch(error => console.error('Error fetching the data:', error));
+
+    // Add event listener for clicks outside the search box
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      // Clean up the event listener on component unmount
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
   }, []);
+
+  const handleClickOutside = (event) => {
+    if (
+      inputRef.current && !inputRef.current.contains(event.target) &&
+      resultsRef.current && !resultsRef.current.contains(event.target)
+    ) {
+      setShowResults(false);
+    }
+  };
 
   const handleInputChange = (event) => {
     const term = event.target.value;
@@ -27,8 +45,10 @@ function App() {
     if (term.length > 3) {
       const { results } = searchAndSuggest(data, term);
       setResults(results);
+      setShowResults(true); // Show results when there is a search term
     } else {
       setResults([]);
+      setShowResults(false); // Hide results when search term is too short
     }
     setActiveIndex(-1);
   };
@@ -58,6 +78,7 @@ function App() {
         const selectedResult = results[activeIndex];
         setSearchTerm(selectedResult.title);
         setResults([]);
+        setShowResults(false); // Hide results on Enter
       }
     }
   };
@@ -84,6 +105,13 @@ function App() {
       setSearchTerm(result.title);
     }
     setResults([]);
+    setShowResults(false); // Hide results on result click
+  };
+
+  const handleSearchBoxClick = () => {
+    if (searchTerm.length > 3) {
+      setShowResults(true); // Show results on search box click if term is valid
+    }
   };
 
   return (
@@ -98,10 +126,11 @@ function App() {
             value={searchTerm}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
+            onClick={handleSearchBoxClick}
             ref={inputRef}
           />
-          {results.length > 0 && (
-            <ul className="results-list">
+          {showResults && results.length > 0 && (
+            <ul className="results-list" ref={resultsRef}>
               {results.map((result, index) => (
                 <li
                   key={index}
